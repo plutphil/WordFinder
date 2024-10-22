@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background: #333;
+            text-align: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #inp{
+            border: 0;
+            background: #eee;
+            font-size: 50pt;
+            font-family: monospace;
+            font-weight: bold;
+            padding: 8pt;
+            border-radius: 0pt;
+            text-align: center;
+            
+        }
+        .charunderline{
+            background: red;
+            width: 36px;
+            height: 5pt;
+            margin-left: 2px; 
+            display: inline-block;
+        }
+        .res{
+            color: #eee;
+            font-size: 50pt;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        #words{
+
+        }
+    </style>
+</head>
+<body>
+<div style="font-size: large;color:#eee;">
+E, N, I, S, R, A, T, D, H, U, L, C, G, M, O, B, W, F, K, Z, P, V, ẞ, J, Y, X, Q
+</div>
+    <div style="height: 100%;display:flex;flex-direction: column;align-items: center;
+    ">
+        <div style="text-align:center;">
+            <input type="text" id="inp" placeholder="Enter Word" width=10 autofocus>
+            </div><input type="text" id="blacklistinput" placeholder="Enter Word" width=10 autofocus>
+        
+        <div id="us" style="height: 10px;padding: 3px;">
+        </div>
+        <button onclick="update()">UPDATE</button>
+        <div id="words" >
+            <div class="res">WORD</div>
+            <div class="res">WORD</div>
+            <div class="res">WORD</div>
+            <div class="res">WORD</div>
+            <div class="res">WORD</div>
+        </div>
+    </div>
+    <script>
+        let inp = document.getElementById("inp");
+        let blacklistinput = document.getElementById("blacklistinput");
+        let us = document.getElementById("us");
+        let words = document.getElementById("words");
+        //inp.value="1234567890";
+        let wordlist = [];
+        update = ()=>{
+            val = inp.value.toLowerCase();
+            us.innerHTML="";
+            for (let i = 0; i < inp.value.length; i++) {
+                div = document.createElement("div");
+                div.className = "charunderline";
+                us.appendChild(div);
+            }
+            let matches = new Map();
+            blacklist = []
+            for (let I = 0; I < val.length; I++) {
+                const e = val[I];
+                if(e==" ")continue;
+                if(e in blacklist){
+
+                }else{
+                    blacklist[e]=1;
+                }
+            }
+            blacklistinputval = blacklistinput.value;
+            for (let i = 0; i < blacklistinputval.length; i++) {
+                const e = blacklistinputval[i];
+                if(e==" ")continue;
+                if(e in blacklist){
+
+                }else{
+                    blacklist[e]=1;
+                }
+            }
+            
+            console.log("blacklist", blacklist)
+            words.innerHTML="";
+            
+            wordlist.forEach(e=>{
+                if(e.length==val.length){
+                    let score = 0;
+                    let lower = e.toLowerCase();
+
+                    for (let i = 0; i < e.length; i++) {
+                        
+                        if(lower[i]==val[i]){
+                            score+=10;
+                        }
+                        else if(lower[i] in blacklist){
+                            
+                            score+=1;
+                        }else{
+                            score+=5;
+                        }
+                    }
+                    if(score>0){
+                        matches.set(e,score);
+                    }
+                }
+            })
+            let sortedArray = Array.from(matches)
+            .sort((a, b) => b[1] - a[1]) // Sort by value, descending
+            .slice(0, 10); // Take first 10 items
+            
+            for (let i = 0; i < sortedArray.length; i++) {
+                div = document.createElement("div");
+                div.className = "res";
+                div.textContent = sortedArray[i];
+                words.appendChild(div);
+            }
+        }
+        //inp.onkeydown=update;
+        inp.onkeyup=update;
+        fetch("wortliste.txt").then(
+            e=>{
+                e.text().then(e=>{
+                    wordlist=e.split("\n");
+                    console.log("loaded wordlist")
+                })
+            }
+        )
+
+    </script>
+</body>
+</html>
